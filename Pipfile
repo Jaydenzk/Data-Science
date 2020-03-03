@@ -15,6 +15,7 @@ xgboost = "==0.90"
 flask-cors = "*"
 requests = "*"
 pickle-mixin = "*"
+spacy = "*"
 
 [requires]
 python_version = "3.7"

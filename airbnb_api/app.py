@@ -3,10 +3,12 @@ import os
 from joblib import load
 import pandas as pd
 import pickle
-#from .tokenizer import token
+from .tokenizer import token
 from .wrangle import wrangle
 
-# Basic set-up for the Airbnb API.
+"""
+Airbnb API using XGB Model.
+"""
 
 
 def create_app():
@@ -96,13 +98,13 @@ def create_app():
         print(data)
 
         # Tokenizer
-        #token_words = data['token_words']
+        token_words = data['token_words']
 
         # convert data into df
         data.update((x, [y]) for x, y in data.items())
         data_df = pd.DataFrame.from_dict(data)
         data_df = wrangle(data_df)
-        #data_df.token_words = token(df.token_words.iloc[0])
+        data_df.token_words = token(df.token_words.iloc[0])
         print(data_df.shape)
 
         # predictions
