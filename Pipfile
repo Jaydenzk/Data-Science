@@ -8,6 +8,14 @@ verify_ssl = true
 [packages]
 flask = "*"
 joblib = "*"
+keras = "*"
+sklearn = "*"
+pandas = "*"
+tensorflow = "*"
+spacey = "*"
+python-dotenv = "*"
+xgboost = "==0.90"
+flask-cors = "*"
 
 [requires]
 python_version = "3.7"
