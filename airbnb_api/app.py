@@ -17,7 +17,7 @@ def create_app():
     """
     app = Flask('__name__', instance_relative_config=True)
 
-    model = pickle.load(open('xgb_reg_two_features', 'rb'))
+    model = pickle.load(open('xgb_reg_fourteen_features', 'rb'))
 
     @app.route('/')
     def root():
@@ -31,9 +31,22 @@ def create_app():
 
         # List of features to use in request
         PARAMETERS = [
-            'bathrooms', 'bedrooms'
+            'bedrooms', 'bathrooms', 'accommodates', 
+            'instant_bookable', 'minimum_nights', 'maximum_nights'
         ]
 
+    #'bedrooms', 'bathrooms', 'accommodates', 'instant_bookable',
+     #'minimum_nights', 'maximum_nights', 'high_end_electronics', 
+     #'high_end_appliances', 'kitchen_luxury', 'child_friendly', 
+     #'privacy', 'free_parking', 'smoking_allowed', 'pets_allowed'
+
+
+
+        AMENITIES = [
+            'high_end_electronics','high_end_appliances', 
+            'kitchen_luxury', 'child_friendly', 'privacy', 
+            'free_parking', 'smoking_allowed','pets_allowed'
+        ]
 
         print('\n\nGetting the request data\n\n')
 
@@ -48,13 +61,13 @@ def create_app():
 
         print('\n\nAmenities:\n')
 
-        #for amenity in AMENITIES:
-           # if amenity in request.args.keys():
+        for amenity in AMENITIES:
+            if amenity in request.args.keys():
 
-                #print(f'{amenity} present! Value: {request.args[amenity]}')
-               # data[amenity.replace(' ', '_')] = 1
-           # else:
-               # data[amenity.replace(' ', '_')] = 0
+                print(f'{amenity} present! Value: {request.args[amenity]}')
+                data[amenity.replace(' ', '_')] = 1
+            else:
+                data[amenity.replace(' ', '_')] = 0
 
         for arg in request.args.keys():
             print(f'{arg}: {request.args[arg]}')
@@ -73,10 +86,10 @@ def create_app():
         print('\n\nmaking a prediction\n\n')
 
         # making a prediction by passing a dataframe through the model
-        result = int(model.predict(data_df)[0])
+        result = model.predict(data_df)
 
         # create a string response to display
-        response = f'The optimal price is {result}'
+        response = f'The optimal price is {result} Euros'
 
         print('\n\n' + response + '\n\n')
 
@@ -108,3 +121,7 @@ def create_app():
         return jsonify(results=outputs)
 
     return app
+
+
+if __name__ == "__main__":
+  app.run(debug=True)
