@@ -1,1 +1,1 @@
-web: gunicorn OPTIMALBNB:APP -t 120
+web: gunicorn airbnb_api:APP -t 120
