@@ -17,6 +17,7 @@ requests = "*"
 pickle-mixin = "*"
 spacy = "*"
 gunicorn = "*"
+werkzeug = "*"
 
 [requires]
 python_version = "3.7"

@@ -3,8 +3,8 @@ import os
 from joblib import load
 import pandas as pd
 import pickle
-from .tokenizer import token
-from .wrangle import wrangle
+# from .tokenizer import token
+# from .wrangle import wrangle
 
 """
 Airbnb API using XGB Model.
@@ -18,7 +18,6 @@ def create_app():
     app = Flask('__name__', instance_relative_config=True)
 
     model = pickle.load(open('xgb_reg_fourteen_features1.pickle', 'rb'))
-
     @app.route('/')
     def root():
         return render_template('base.html', optimal_price="")
