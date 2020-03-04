@@ -17,7 +17,7 @@ def create_app():
     """
     app = Flask('__name__', instance_relative_config=True)
 
-    model = pickle.load(open('xgb_reg_fourteen_features', 'rb'))
+    model = pickle.load(open('xgb_reg_fourteen_features1', 'rb'))
 
     @app.route('/')
     def root():
@@ -34,13 +34,6 @@ def create_app():
             'bedrooms', 'bathrooms', 'accommodates', 
             'instant_bookable', 'minimum_nights', 'maximum_nights'
         ]
-
-    #'bedrooms', 'bathrooms', 'accommodates', 'instant_bookable',
-     #'minimum_nights', 'maximum_nights', 'high_end_electronics', 
-     #'high_end_appliances', 'kitchen_luxury', 'child_friendly', 
-     #'privacy', 'free_parking', 'smoking_allowed', 'pets_allowed'
-
-
 
         AMENITIES = [
             'high_end_electronics','high_end_appliances', 
@@ -86,8 +79,7 @@ def create_app():
         print('\n\nmaking a prediction\n\n')
 
         # making a prediction by passing a dataframe through the model
-        result = model.predict(data_df)
-
+        result = int(model.predict(data_df))
         # create a string response to display
         response = f'The optimal price is {result} Euros'
 
