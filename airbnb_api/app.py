@@ -17,7 +17,7 @@ def create_app():
     """
     app = Flask('__name__', instance_relative_config=True)
 
-    model = pickle.load(open('xgb_reg_fourteen_features1', 'rb'))
+    model = pickle.load(open('xgb_reg_fourteen_features1.pickle', 'rb'))
 
     @app.route('/')
     def root():
