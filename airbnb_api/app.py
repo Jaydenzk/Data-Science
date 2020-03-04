@@ -17,7 +17,7 @@ def create_app():
     """
     app = Flask('__name__', instance_relative_config=True)
 
-    model = pickle.load(open('model.pkl', 'rb'))
+    model = pickle.load(open('xgb_reg_two_features', 'rb'))
 
     @app.route('/')
     def root():
@@ -31,18 +31,9 @@ def create_app():
 
         # List of features to use in request
         PARAMETERS = [
-            'neighbourhood_group_cleansed', 'room_type', 'accommodates',
-            'bathrooms', 'bedrooms', 'beds', 'bed_type', 'security_deposit',
-            'cleaning_fee', 'minimum_nights'
+            'bathrooms', 'bedrooms'
         ]
 
-        AMENITIES = [
-            'Washer', 'Hair dryer', 'Laptop friendly workspace', 'Hangers',
-            'Iron', 'Shampoo', 'TV', 'Hot water', 'Family/kid friendly', 'Internet',
-            'Host greets you', 'Smoke detector', 'Buzzer/wireless intercom',
-            'Lock on bedroom door', 'Free street parking', 'Elevator', 'Bed linens',
-            'Smoking allowed', 'First aid kit', 'Cable TV'
-        ]
 
         print('\n\nGetting the request data\n\n')
 
@@ -57,13 +48,13 @@ def create_app():
 
         print('\n\nAmenities:\n')
 
-        for amenity in AMENITIES:
-            if amenity in request.args.keys():
+        #for amenity in AMENITIES:
+           # if amenity in request.args.keys():
 
-                print(f'{amenity} present! Value: {request.args[amenity]}')
-                data[amenity.replace(' ', '_')] = 1
-            else:
-                data[amenity.replace(' ', '_')] = 0
+                #print(f'{amenity} present! Value: {request.args[amenity]}')
+               # data[amenity.replace(' ', '_')] = 1
+           # else:
+               # data[amenity.replace(' ', '_')] = 0
 
         for arg in request.args.keys():
             print(f'{arg}: {request.args[arg]}')
@@ -90,7 +81,7 @@ def create_app():
         print('\n\n' + response + '\n\n')
 
         # convert the dict to a JSON object and return it
-        return render_template('example_form.html', optimal_price=response)
+        return render_template('base.html', optimal_price=response)
 
     @app.route('/json', methods=['GET'])
     def json():
