@@ -1,1 +1,1 @@
-web: gunicorn DATA-SCIENCE:APP -t 120
+web: gunicorn server:APP -t 120
