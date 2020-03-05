@@ -11,6 +11,12 @@ from flask_cors import CORS
 Airbnb API using XGB Model.
 """
 
+"""
+This build is the one that was used for final production. It returns the
+prediction in a string format and has CORS implemented which helps prevent
+web errors.
+"""
+
 
 def create_app():
     """
