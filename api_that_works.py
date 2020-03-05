@@ -3,6 +3,7 @@ import os
 from joblib import load
 import pandas as pd
 import pickle
+from flask_cors import CORS
 # from .tokenizer import token
 # from .wrangle import wrangle
 
@@ -16,6 +17,8 @@ def create_app():
     Create and configure the application.
     """
     app = Flask('__name__', instance_relative_config=True)
+
+    CORS(app)  # prevents web errors
 
     model = pickle.load(open('xgb_reg_fourteen_features1.pickle', 'rb'))
     @app.route('/')
@@ -78,39 +81,14 @@ def create_app():
         print('\n\nmaking a prediction\n\n')
 
         # making a prediction by passing a dataframe through the model
-        result = int(model.predict(data_df))
+        result = str(model.predict(data_df))
         # create a string response to display
         response = f'The optimal price is {result} Euros'
 
         print('\n\n' + response + '\n\n')
 
         # convert the dict to a JSON object and return it
-        return render_template('base.html', optimal_price=response)
-
-    @app.route('/json', methods=['GET'])
-    def json():
-        data = request.get_json(force=True)
-        print(data)
-
-        # Tokenizer
-        token_words = data['token_words']
-
-        # convert data into df
-        data.update((x, [y]) for x, y in data.items())
-        data_df = pd.DataFrame.from_dict(data)
-        data_df = wrangle(data_df)
-        data_df.token_words = token(df.token_words.iloc[0])
-        print(data_df.shape)
-
-        # predictions
-        result = model.predict(data_df.iloc[0:1])
-
-        # output to the browser
-        output = {'results': int(result[0])}
-
-        # return data
-        return jsonify(results=outputs)
-
+        return result
     return app
 
 
