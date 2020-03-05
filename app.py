@@ -89,3 +89,8 @@ def create_app():
 
         # convert the dict to a JSON object and return it
         return results
+    return app
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
