@@ -10,109 +10,51 @@ import pickle
 Airbnb API using XGB Model.
 """
 
+# create app:
+
 
 def create_app():
-    """
-    Create and configure the application.
-    """
-    app = Flask('__name__', instance_relative_config=True)
+    app = Flask(__name__)
 
+    # load pipeline pickle:
     model = pickle.load(open('xgb_reg_fourteen_features1.pickle', 'rb'))
-    @app.route('/')
-    def root():
-        return render_template('base.html', optimal_price="")
 
-    @app.route('/predict', methods=['GET'])
-    def predict():
+    @app.route('/', methods=['POST'])
+    def prediction():
+        """
+        Receives data in JSON format, creates dataframe with data,
+        runs through predictive model, returns predicted price as JSON object.
+        """
 
-        # defining a dictionary to store data in
-        data = {}
+        # Receive data:
+        listings = request.get_json(force=True)
 
-        # List of features to use in request
-        PARAMETERS = [
-            'bedrooms', 'bathrooms', 'accommodates', 
-            'instant_bookable', 'minimum_nights', 'maximum_nights'
-        ]
+        # Features used in predictive model:
+        accommodates = listings["accommodates"]
+        bathrooms = listings["bathrooms"]
+        bedrooms = listings["bedrooms"]
+        minimum_nights = listings["minimum_nights"]
+        maximum_nights = listings["maximum_nights"]
+        instant_bookable = listings["instant_bookable"]
 
-        AMENITIES = [
-            'high_end_electronics','high_end_appliances', 
-            'kitchen_luxury', 'child_friendly', 'privacy', 
-            'free_parking', 'smoking_allowed','pets_allowed'
-        ]
+        features = {'accommodates': accommodates,
+                    'bathrooms': bathrooms,
+                    'bedrooms': bedrooms,
+                    'minimum_nights': minimum_nights,
+                    'maximum_nights': maximum_nights,
+                    'instant_bookable': instant_bookable}
 
-        print('\n\nGetting the request data\n\n')
+        # Convert data into DataFrame:
+        df = pd.DataFrame(listings, index=[1])
 
-        # load the data
-        for param in PARAMETERS:
-            print(f'{param} type:', type(request.args[param]))
-            print(f'{param}:', request.args[param])
-            try:
-                data[param] = [int(request.args[param])]
-            except:
-                data[param] = [request.args[param]]
+        # Make prediction for optimal price:
+        prediction = str(model.predict(df))
 
-        print('\n\nAmenities:\n')
-
-        for amenity in AMENITIES:
-            if amenity in request.args.keys():
-
-                print(f'{amenity} present! Value: {request.args[amenity]}')
-                data[amenity.replace(' ', '_')] = 1
-            else:
-                data[amenity.replace(' ', '_')] = 0
-
-        for arg in request.args.keys():
-            print(f'{arg}: {request.args[arg]}')
-
-        print('\n\nConverting to dataframe\n\n')
-
-        # convert data into dataframe to be passed through the model
-        data_df = pd.DataFrame.from_dict(data)
-
-        # more options can be specified also
-        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-            print('\n\n', data_df, '\n\n')
-
-        #data_df = wrangle(data_df)
-
-        print('\n\nmaking a prediction\n\n')
-
-        # making a prediction by passing a dataframe through the model
-        result = int(model.predict(data_df))
-        # create a string response to display
-        response = f'The optimal price is {result} Euros'
-
-        print('\n\n' + response + '\n\n')
-
-        # convert the dict to a JSON object and return it
-        return render_template('base.html', optimal_price=response)
-
-    @app.route('/json', methods=['GET'])
-    def json():
-        data = request.get_json(force=True)
-        print(data)
-
-        # Tokenizer
-        token_words = data['token_words']
-
-        # convert data into df
-        data.update((x, [y]) for x, y in data.items())
-        data_df = pd.DataFrame.from_dict(data)
-        data_df = wrangle(data_df)
-        data_df.token_words = token(df.token_words.iloc[0])
-        print(data_df.shape)
-
-        # predictions
-        result = model.predict(data_df.iloc[0:1])
-
-        # output to the browser
-        output = {'results': int(result[0])}
-
-        # return data
-        return jsonify(results=outputs)
+        # Return JSON object:
+        return jsonify(output)
 
     return app
 
 
 if __name__ == "__main__":
-  app.run(debug=True)
+    app.run(debug=True)
