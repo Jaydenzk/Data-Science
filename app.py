@@ -18,7 +18,7 @@ def create_app():
     """
     app = Flask('__name__', instance_relative_config=True)
 
-    CORS(app)
+    CORS(app)  # prevents web errors
 
     model = pickle.load(open('xgb_reg_fourteen_features1.pickle', 'rb'))
     @app.route('/')
@@ -88,7 +88,7 @@ def create_app():
         print('\n\n' + response + '\n\n')
 
         # convert the dict to a JSON object and return it
-        return results
+        return result
     return app
 
 
