@@ -3,6 +3,7 @@ import os
 from joblib import load
 import pandas as pd
 import pickle
+from flask_cors import CORS
 # from .tokenizer import token
 # from .wrangle import wrangle
 
@@ -10,51 +11,81 @@ import pickle
 Airbnb API using XGB Model.
 """
 
-# create app:
-
 
 def create_app():
-    app = Flask(__name__)
+    """
+    Create and configure the application.
+    """
+    app = Flask('__name__', instance_relative_config=True)
 
-    # load pipeline pickle:
+    CORS(app)
+
     model = pickle.load(open('xgb_reg_fourteen_features1.pickle', 'rb'))
+    @app.route('/')
+    def root():
+        return render_template('base.html', optimal_price="")
 
-    @app.route('/', methods=['GET'])
-    def prediction():
-        """
-        Receives data in JSON format, creates dataframe with data,
-        runs through predictive model, returns predicted price as JSON object.
-        """
+    @app.route('/predict', methods=['GET'])
+    def predict():
 
-        # Receive data:
-        listings = request.get_json(force=True)
+        # defining a dictionary to store data in
+        data = {}
 
-        # Features used in predictive model:
-        accommodates = listings["accommodates"]
-        bathrooms = listings["bathrooms"]
-        bedrooms = listings["bedrooms"]
-        minimum_nights = listings["minimum_nights"]
-        maximum_nights = listings["maximum_nights"]
-        instant_bookable = listings["instant_bookable"]
+        # List of features to use in request
+        PARAMETERS = [
+            'bedrooms', 'bathrooms', 'accommodates',
+            'instant_bookable', 'minimum_nights', 'maximum_nights'
+        ]
 
-        features = {'accommodates': accommodates,
-                    'bathrooms': bathrooms,
-                    'bedrooms': bedrooms,
-                    'minimum_nights': minimum_nights,
-                    'maximum_nights': maximum_nights,
-                    'instant_bookable': instant_bookable}
+        AMENITIES = [
+            'high_end_electronics', 'high_end_appliances',
+            'kitchen_luxury', 'child_friendly', 'privacy',
+            'free_parking', 'smoking_allowed', 'pets_allowed'
+        ]
 
-        # Convert data into DataFrame:
-        df = pd.DataFrame(listings, index=[1])
+        print('\n\nGetting the request data\n\n')
 
-        # Make prediction for optimal price:
-        prediction = str(model.predict(df))
+        # load the data
+        for param in PARAMETERS:
+            print(f'{param} type:', type(request.args[param]))
+            print(f'{param}:', request.args[param])
+            try:
+                data[param] = [int(request.args[param])]
+            except:
+                data[param] = [request.args[param]]
 
-        # Return JSON object:
-        return jsonify(output)
+        print('\n\nAmenities:\n')
 
-    return app
+        for amenity in AMENITIES:
+            if amenity in request.args.keys():
 
+                print(f'{amenity} present! Value: {request.args[amenity]}')
+                data[amenity.replace(' ', '_')] = 1
+            else:
+                data[amenity.replace(' ', '_')] = 0
 
-if __name__ == "__main__":
-    app.run(debug=True)
+        for arg in request.args.keys():
+            print(f'{arg}: {request.args[arg]}')
+
+        print('\n\nConverting to dataframe\n\n')
+
+        # convert data into dataframe to be passed through the model
+        data_df = pd.DataFrame.from_dict(data)
+
+        # more options can be specified also
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            print('\n\n', data_df, '\n\n')
+
+        #data_df = wrangle(data_df)
+
+        print('\n\nmaking a prediction\n\n')
+
+        # making a prediction by passing a dataframe through the model
+        result = str(model.predict(data_df))
+        # create a string response to display
+        response = f'The optimal price is {result} Euros'
+
+        print('\n\n' + response + '\n\n')
+
+        # convert the dict to a JSON object and return it
+        return results
