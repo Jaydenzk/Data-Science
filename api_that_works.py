@@ -18,7 +18,7 @@ web errors.
 
 Also, we had issues deploying to Heroku because the Procfile could
 not read the blueprint. The reason was because the app along with
-the service file(aka:__init__) file were stored in a seperate file.
+the service file(aka:__init__) file was stored in a seperate folder.
 Once we put everything in the same place(Data-Science folder) it worked.
 """
 
